@@ -1,0 +1,567 @@
+.page {
+  min-height: 100vh;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(139, 94, 52, 0.12), transparent 28%),
+    linear-gradient(180deg, #fffaf4 0%, #fbfbfb 42%, #f4f4f5 100%);
+}
+
+.phone {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding-bottom: 28px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 2px 18px;
+}
+
+.kicker,
+.sectionLabel {
+  margin: 0 0 6px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.header h1,
+.gameCard h2,
+.board h2 {
+  margin: 0;
+  color: var(--foreground);
+  letter-spacing: 0;
+}
+
+.header h1 {
+  font-size: 30px;
+  line-height: 1.05;
+}
+
+.userPill,
+.cutoff,
+.loserBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.gameCard,
+.resultCard,
+.board,
+.table {
+  margin-bottom: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: var(--shadow);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.loginPanel,
+.descriptionPanel {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--muted);
+}
+
+.loginPanel strong,
+.descriptionPanel strong {
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.loginPanel p,
+.descriptionPanel p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.statusGrid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.statusGrid span {
+  color: var(--muted-foreground);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.statusGrid strong {
+  font-size: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+.field span {
+  color: var(--muted-foreground);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.field input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--input);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--foreground);
+  font-size: 16px;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.12);
+}
+
+.settingsPanel {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.secondaryButton {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.secondaryButton:disabled {
+  cursor: default;
+  opacity: 0.58;
+}
+
+.notice {
+  margin: 0;
+  color: var(--destructive);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.yutStage {
+  display: grid;
+  place-items: center;
+  min-height: 244px;
+  margin-bottom: 18px;
+  padding: 18px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(244, 234, 223, 0.85), rgba(255, 255, 255, 0.9)),
+    var(--coffee-soft);
+  text-align: center;
+  overflow: hidden;
+}
+
+.yutSticks {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 34px);
+  gap: 9px;
+  align-items: end;
+  justify-content: center;
+  width: 100%;
+  min-height: 116px;
+  margin-bottom: 14px;
+  perspective: 700px;
+}
+
+.stick {
+  position: relative;
+  width: 34px;
+  height: 108px;
+  border: 1px solid #9a6a3a;
+  border-radius: 18px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.42), transparent 38%),
+    linear-gradient(180deg, #d8a15f, #a7672d);
+  box-shadow: 0 8px 18px rgba(139, 94, 52, 0.18);
+  transform: rotate(var(--angle, -5deg));
+  transform-origin: 50% 80%;
+}
+
+.stick span {
+  position: absolute;
+  inset: 10px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.36);
+}
+
+.front {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.45), transparent 42%),
+    linear-gradient(180deg, #f3c77f, #b87332);
+}
+
+.back {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.18) 0 8px, transparent 8px 18px),
+    linear-gradient(180deg, #7a4b25, #4f2e16);
+}
+
+.back span {
+  opacity: 0;
+}
+
+.stick:nth-child(1) {
+  --angle: -8deg;
+}
+
+.stick:nth-child(2) {
+  --angle: 5deg;
+}
+
+.stick:nth-child(3) {
+  --angle: -2deg;
+}
+
+.stick:nth-child(4) {
+  --angle: 7deg;
+}
+
+.throwing .stick {
+  animation-duration: 1.2s;
+  animation-timing-function: cubic-bezier(0.18, 0.74, 0.22, 1);
+  animation-fill-mode: both;
+}
+
+.spin1 {
+  animation-name: tossOne;
+}
+
+.spin2 {
+  animation-name: tossTwo;
+}
+
+.spin3 {
+  animation-name: tossThree;
+}
+
+.spin4 {
+  animation-name: tossFour;
+}
+
+.yutMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--coffee);
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.yutStage p {
+  max-width: 280px;
+  margin: 0 0 12px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.gaugeWrap {
+  position: relative;
+  margin: 12px 0 18px;
+  padding: 10px 0 0;
+}
+
+.gaugeMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.gauge {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  border: 1px solid var(--input);
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(239, 68, 68, 0.32),
+      rgba(245, 158, 11, 0.38),
+      rgba(22, 163, 74, 0.64),
+      rgba(245, 158, 11, 0.38),
+      rgba(239, 68, 68, 0.32)
+    );
+  overflow: visible;
+}
+
+.marker {
+  position: absolute;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 7px 16px rgba(24, 24, 27, 0.22);
+  transform: translate(-50%, -50%);
+}
+
+.throwButton {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 10px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.throwButton {
+  border: 1px solid var(--primary);
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.throwButton:disabled {
+  cursor: default;
+  opacity: 0.62;
+}
+
+.resultCard pre {
+  max-height: 240px;
+  margin: 0;
+  overflow: auto;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.finalNotice {
+  margin: 10px 0 0;
+  color: var(--muted-foreground);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.myResult {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--muted);
+}
+
+.myResult span {
+  color: var(--coffee);
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.myResult strong {
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+
+.rows {
+  display: grid;
+  gap: 8px;
+}
+
+.row,
+.probRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--muted);
+}
+
+.row strong {
+  color: var(--coffee);
+  font-size: 20px;
+}
+
+.rankName {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  min-height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.lockedBoard {
+  display: grid;
+  place-items: center;
+  min-height: 138px;
+  padding: 18px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  background: var(--muted);
+  text-align: center;
+}
+
+.lockedBoard strong {
+  margin-bottom: 6px;
+  font-size: 20px;
+}
+
+.lockedBoard p {
+  max-width: 250px;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.probRow {
+  margin-top: 8px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+
+.probRow strong {
+  min-width: 58px;
+  color: var(--foreground);
+  text-transform: capitalize;
+}
+
+@keyframes tossOne {
+  0% {
+    transform: translate(0, 0) rotate(-8deg) rotateX(0deg);
+  }
+  45% {
+    transform: translate(-18px, -92px) rotate(-90deg) rotateX(240deg);
+  }
+  100% {
+    transform: translate(-2px, 0) rotate(-12deg) rotateX(720deg);
+  }
+}
+
+@keyframes tossTwo {
+  0% {
+    transform: translate(0, 0) rotate(5deg) rotateX(0deg);
+  }
+  42% {
+    transform: translate(8px, -110px) rotate(80deg) rotateX(300deg);
+  }
+  100% {
+    transform: translate(3px, 0) rotate(8deg) rotateX(720deg);
+  }
+}
+
+@keyframes tossThree {
+  0% {
+    transform: translate(0, 0) rotate(-2deg) rotateX(0deg);
+  }
+  48% {
+    transform: translate(20px, -84px) rotate(120deg) rotateX(260deg);
+  }
+  100% {
+    transform: translate(-1px, 0) rotate(-4deg) rotateX(720deg);
+  }
+}
+
+@keyframes tossFour {
+  0% {
+    transform: translate(0, 0) rotate(7deg) rotateX(0deg);
+  }
+  44% {
+    transform: translate(24px, -102px) rotate(-110deg) rotateX(280deg);
+  }
+  100% {
+    transform: translate(2px, 0) rotate(11deg) rotateX(720deg);
+  }
+}
+
+@media (max-width: 360px) {
+  .page {
+    padding: 10px;
+  }
+
+  .header h1 {
+    font-size: 26px;
+  }
+
+  .gameCard,
+  .resultCard,
+  .board,
+  .table {
+    padding: 13px;
+  }
+}
