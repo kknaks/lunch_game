@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { todayGame as mockTodayGame } from "@/lib/mock-data";
 import {
   changePassword,
+  canReadLeaderboard,
   getCurrentUser,
   getLeaderboard,
   getMyTodayResult,
@@ -116,7 +117,9 @@ export function LunchGameApp() {
 
         const game = await getTodayGame();
         const savedResult = await getMyTodayResult(game.id);
-        const rows = await getLeaderboard(game.id);
+        const rows = canReadLeaderboard(game.playDate, Boolean(savedResult))
+          ? await getLeaderboard(game.id)
+          : [];
 
         if (cancelled) return;
 
@@ -155,7 +158,9 @@ export function LunchGameApp() {
       const user = await signInWithEmail(email, password);
       const game = await getTodayGame();
       const savedResult = await getMyTodayResult(game.id);
-      const rows = await getLeaderboard(game.id);
+      const rows = canReadLeaderboard(game.playDate, Boolean(savedResult))
+        ? await getLeaderboard(game.id)
+        : [];
 
       setUserName(user.displayName);
       setTodayGame(game);
@@ -225,23 +230,29 @@ export function LunchGameApp() {
     if (playState !== "throwing" || !pendingResult) return;
 
     const revealTimer = window.setTimeout(async () => {
+      const finalResult = pendingResult;
+      setResult(finalResult);
+      setPlayState("submitted");
+      setPendingResult(null);
+
       try {
         await submitGameResult({
           gameId: todayGame.id,
-          score: pendingResult.score,
-          rankValue: pendingResult.rankValue,
-          resultLabel: pendingResult.resultLabel,
-          metadata: pendingResult.metadata,
+          score: finalResult.score,
+          rankValue: finalResult.rankValue,
+          resultLabel: finalResult.resultLabel,
+          metadata: finalResult.metadata,
         });
-        setResult(pendingResult);
-        setPlayState("submitted");
+      } catch (error) {
+        setNotice(`결과 저장 실패: ${(error as Error).message}`);
+        return;
+      }
+
+      try {
         const rows = await getLeaderboard(todayGame.id);
         if (rows.length) setLeaderboard(rows);
       } catch (error) {
-        setNotice((error as Error).message);
-        setPlayState("aiming");
-        setPendingResult(null);
-        setIsRunning(true);
+        setNotice(`랭킹 조회 실패: ${(error as Error).message}`);
       }
     }, 1350);
 
@@ -249,7 +260,7 @@ export function LunchGameApp() {
   }, [pendingResult, playState, todayGame.id]);
 
   function throwYut() {
-    if (playState !== "aiming") return;
+    if (playState !== "aiming" || isPastCutoff) return;
 
     const nextResult = drawYutResult(gaugePosition);
     setIsRunning(false);
@@ -359,10 +370,11 @@ export function LunchGameApp() {
             </div>
             <button
               className={styles.throwButton}
+              disabled={isPastCutoff}
               onClick={() => setScreenState("game")}
               type="button"
             >
-              참여하기
+              {isPastCutoff ? "오늘 게임이 끝났습니다" : "참여하기"}
             </button>
             <div className={styles.settingsPanel}>
               <p className={styles.sectionLabel}>Settings</p>
@@ -455,7 +467,7 @@ export function LunchGameApp() {
 
           <button
             className={styles.throwButton}
-            disabled={isLocked}
+            disabled={isLocked || isPastCutoff}
             onClick={throwYut}
             type="button"
           >
@@ -463,6 +475,8 @@ export function LunchGameApp() {
               ? "윷 던지는 중"
               : playState === "submitted"
                 ? "오늘은 이미 참여했습니다"
+                : isPastCutoff
+                  ? "오늘 게임이 끝났습니다"
                 : "게이지 멈추고 윷 던지기"}
           </button>
           <p className={styles.finalNotice}>한 번 던지면 다시 참여할 수 없습니다.</p>

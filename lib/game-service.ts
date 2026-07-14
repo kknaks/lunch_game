@@ -181,6 +181,10 @@ export async function getLeaderboard(gameId: string): Promise<LeaderboardRow[]> 
   }));
 }
 
+export function canReadLeaderboard(playDate: string, hasResult: boolean) {
+  return hasResult || isPastKstCutoff(playDate);
+}
+
 function getKstDateString() {
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Seoul",
@@ -199,4 +203,15 @@ function formatKstTime(value: string) {
     minute: "2-digit",
     hour12: false,
   }).format(new Date(value));
+}
+
+function isPastKstCutoff(playDate: string, cutoffHour = 12, cutoffMinute = 30) {
+  const now = new Date();
+  const kstNow = new Date(
+    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }),
+  );
+  const [year, month, day] = playDate.split("-").map(Number);
+  const cutoff = new Date(year, month - 1, day, cutoffHour, cutoffMinute);
+
+  return kstNow >= cutoff;
 }

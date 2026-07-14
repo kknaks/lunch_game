@@ -42,6 +42,22 @@ drop policy if exists "daily games readable by authenticated" on public.daily_ga
 drop policy if exists "results readable by participants" on public.game_results;
 drop policy if exists "users insert own result before cutoff" on public.game_results;
 
+create or replace function public.has_submitted_result(target_game_id uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.game_results gr
+    where gr.game_id = target_game_id
+      and gr.user_id = auth.uid()
+  );
+$$;
+
+grant execute on function public.has_submitted_result(uuid) to authenticated;
+
 create policy "profiles readable by authenticated"
   on public.profiles for select
   to authenticated
@@ -56,12 +72,7 @@ create policy "results readable by participants"
   on public.game_results for select
   to authenticated
   using (
-    exists (
-      select 1
-      from public.game_results mine
-      where mine.game_id = game_results.game_id
-        and mine.user_id = auth.uid()
-    )
+    public.has_submitted_result(game_id)
     or exists (
       select 1
       from public.daily_games dg
