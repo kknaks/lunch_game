@@ -57,15 +57,8 @@ function getRankedRows(rows: LeaderboardRow[]) {
     }));
 }
 
-function isPastKstCutoff(playDate: string, cutoffHour = 12, cutoffMinute = 30) {
-  const now = new Date();
-  const kstNow = new Date(
-    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }),
-  );
-  const [year, month, day] = playDate.split("-").map(Number);
-  const cutoff = new Date(year, month - 1, day, cutoffHour, cutoffMinute);
-
-  return kstNow >= cutoff;
+function isPastCutoff(cutoffAt: string) {
+  return Date.now() >= new Date(cutoffAt).getTime();
 }
 
 export function LunchGameApp() {
@@ -104,8 +97,8 @@ export function LunchGameApp() {
 
   const losers = useMemo(() => getLosers(displayLeaderboard), [displayLeaderboard]);
   const rankedRows = useMemo(() => getRankedRows(displayLeaderboard), [displayLeaderboard]);
-  const isPastCutoff = isPastKstCutoff(todayGame.playDate);
-  const canSeeResults = Boolean(result) || isPastCutoff;
+  const hasPastCutoff = isPastCutoff(todayGame.cutoffAt);
+  const canSeeResults = Boolean(result) || hasPastCutoff;
 
   useEffect(() => {
     let cancelled = false;
@@ -117,7 +110,7 @@ export function LunchGameApp() {
 
         const game = await getTodayGame();
         const savedResult = await getMyTodayResult(game.id);
-        const rows = canReadLeaderboard(game.playDate, Boolean(savedResult))
+        const rows = canReadLeaderboard(game.cutoffAt, Boolean(savedResult))
           ? await getLeaderboard(game.id)
           : [];
 
@@ -158,7 +151,7 @@ export function LunchGameApp() {
       const user = await signInWithEmail(email, password);
       const game = await getTodayGame();
       const savedResult = await getMyTodayResult(game.id);
-      const rows = canReadLeaderboard(game.playDate, Boolean(savedResult))
+      const rows = canReadLeaderboard(game.cutoffAt, Boolean(savedResult))
         ? await getLeaderboard(game.id)
         : [];
 
@@ -260,7 +253,7 @@ export function LunchGameApp() {
   }, [pendingResult, playState, todayGame.id]);
 
   function throwYut() {
-    if (playState !== "aiming" || isPastCutoff) return;
+    if (playState !== "aiming" || hasPastCutoff) return;
 
     const nextResult = drawYutResult(gaugePosition);
     setIsRunning(false);
@@ -370,11 +363,11 @@ export function LunchGameApp() {
             </div>
             <button
               className={styles.throwButton}
-              disabled={isPastCutoff}
+              disabled={hasPastCutoff}
               onClick={() => setScreenState("game")}
               type="button"
             >
-              {isPastCutoff ? "오늘 게임이 끝났습니다" : "참여하기"}
+              {hasPastCutoff ? "오늘 게임이 끝났습니다" : "참여하기"}
             </button>
             <div className={styles.settingsPanel}>
               <p className={styles.sectionLabel}>Settings</p>
@@ -467,7 +460,7 @@ export function LunchGameApp() {
 
           <button
             className={styles.throwButton}
-            disabled={isLocked || isPastCutoff}
+            disabled={isLocked || hasPastCutoff}
             onClick={throwYut}
             type="button"
           >
@@ -475,7 +468,7 @@ export function LunchGameApp() {
               ? "윷 던지는 중"
               : playState === "submitted"
                 ? "오늘은 이미 참여했습니다"
-                : isPastCutoff
+                : hasPastCutoff
                   ? "오늘 게임이 끝났습니다"
                 : "게이지 멈추고 윷 던지기"}
           </button>

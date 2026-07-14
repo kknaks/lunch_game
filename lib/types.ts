@@ -5,6 +5,7 @@ export type DailyGame = {
   playDate: string;
   gameType: "yut_gauge";
   title: string;
+  cutoffAt: string;
   cutoffLabel: string;
   status: "open" | "closed";
 };

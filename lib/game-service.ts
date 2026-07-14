@@ -103,6 +103,7 @@ export async function getTodayGame(): Promise<DailyGame> {
     playDate: data.play_date,
     gameType: data.game_type,
     title: data.title,
+    cutoffAt: data.cutoff_at,
     cutoffLabel: formatKstTime(data.cutoff_at),
     status: data.status,
   };
@@ -181,8 +182,8 @@ export async function getLeaderboard(gameId: string): Promise<LeaderboardRow[]> 
   }));
 }
 
-export function canReadLeaderboard(playDate: string, hasResult: boolean) {
-  return hasResult || isPastKstCutoff(playDate);
+export function canReadLeaderboard(cutoffAt: string, hasResult: boolean) {
+  return hasResult || isPastCutoff(cutoffAt);
 }
 
 function getKstDateString() {
@@ -205,13 +206,6 @@ function formatKstTime(value: string) {
   }).format(new Date(value));
 }
 
-function isPastKstCutoff(playDate: string, cutoffHour = 12, cutoffMinute = 30) {
-  const now = new Date();
-  const kstNow = new Date(
-    now.toLocaleString("en-US", { timeZone: "Asia/Seoul" }),
-  );
-  const [year, month, day] = playDate.split("-").map(Number);
-  const cutoff = new Date(year, month - 1, day, cutoffHour, cutoffMinute);
-
-  return kstNow >= cutoff;
+function isPastCutoff(cutoffAt: string) {
+  return Date.now() >= new Date(cutoffAt).getTime();
 }
