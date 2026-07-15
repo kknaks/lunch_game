@@ -20,8 +20,9 @@ export const gameDefinitions: Record<GameType, GameDefinition> = {
     defaultTitle: "오늘의 카드뽑기",
     introHeadline: "손을 떼는 순간 카드가 결정됩니다",
     introDescription:
-      "버튼을 누르고 있는 동안 카드 52장을 계속 섞습니다. 손을 떼면 카드 한 장이 공개되고, 카드가 높을수록 순위가 올라갑니다.",
-    resultCaption: (result) => `카드 서열 ${result.rankValue} / ${deckSize}`,
+      "버튼을 누르고 있는 동안 카드 52장을 계속 섞습니다. 손을 떼면 카드 한 장이 공개되고, 카드가 높을수록 순위가 올라갑니다. 같은 숫자끼리는 ♠ > ♦ > ♥ > ♣ 순서입니다.",
+    resultCaption: (result) =>
+      `${deckSize}장 중 ${deckSize - result.rankValue + 1}번째로 높은 카드`,
     Play: CardDrawPlay,
   },
 };

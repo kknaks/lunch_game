@@ -220,6 +220,45 @@
   text-shadow: 0 2px 3px rgba(15, 23, 42, 0.14);
 }
 
+.pipArea {
+  position: absolute;
+  inset: 24px 22px;
+}
+
+.pip {
+  position: absolute;
+  font-style: normal;
+  font-size: 19px;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
+
+.pipFlipped {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.courtBox {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 10px 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 8px;
+}
+
+.courtBox strong {
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 700;
+  font-family: "Times New Roman", Georgia, serif;
+}
+
+.courtBox em {
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+}
+
 .cardMark {
   display: inline-flex;
   align-items: center;

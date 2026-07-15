@@ -7,6 +7,21 @@ import styles from "./card-draw-play.module.css";
 
 const riffleCards = [1, 2, 3, 4, 5, 6] as const;
 
+const courtValues = ["J", "Q", "K"];
+
+// 숫자 카드의 핍(무늬) 배치: [x%, y%] — 실제 트럼프 카드 배열
+const pipLayouts: Record<string, [number, number][]> = {
+  "2": [[50, 16], [50, 84]],
+  "3": [[50, 16], [50, 50], [50, 84]],
+  "4": [[32, 16], [68, 16], [32, 84], [68, 84]],
+  "5": [[32, 16], [68, 16], [50, 50], [32, 84], [68, 84]],
+  "6": [[32, 16], [68, 16], [32, 50], [68, 50], [32, 84], [68, 84]],
+  "7": [[32, 16], [68, 16], [50, 33], [32, 50], [68, 50], [32, 84], [68, 84]],
+  "8": [[32, 16], [68, 16], [50, 33], [32, 50], [68, 50], [50, 67], [32, 84], [68, 84]],
+  "9": [[32, 14], [68, 14], [32, 38], [68, 38], [50, 50], [32, 62], [68, 62], [32, 86], [68, 86]],
+  "10": [[32, 14], [68, 14], [50, 26], [32, 38], [68, 38], [32, 62], [68, 62], [50, 74], [32, 86], [68, 86]],
+};
+
 function parseCardLabel(label: string) {
   const suitSymbol = label.slice(0, 1);
   const value = label.slice(1);
@@ -70,7 +85,29 @@ export function CardDrawPlay({ savedResult, cutoffPassed, onFinish }: GamePlayPr
                 {card.value}
                 <em>{card.suitSymbol}</em>
               </span>
-              <span className={styles.suitBig}>{card.suitSymbol}</span>
+              {card.value === "A" ? (
+                <span className={styles.suitBig}>{card.suitSymbol}</span>
+              ) : courtValues.includes(card.value) ? (
+                <span className={styles.courtBox}>
+                  <strong>{card.value}</strong>
+                  <em>{card.suitSymbol}</em>
+                </span>
+              ) : (
+                <span className={styles.pipArea}>
+                  {pipLayouts[card.value]?.map(([x, y], index) => (
+                    <i
+                      className={[
+                        styles.pip,
+                        y > 50 ? styles.pipFlipped : "",
+                      ].join(" ")}
+                      key={index}
+                      style={{ left: `${x}%`, top: `${y}%` }}
+                    >
+                      {card.suitSymbol}
+                    </i>
+                  ))}
+                </span>
+              )}
               <span className={styles.cornerBottom}>
                 {card.value}
                 <em>{card.suitSymbol}</em>
@@ -103,7 +140,7 @@ export function CardDrawPlay({ savedResult, cutoffPassed, onFinish }: GamePlayPr
           {isRevealing
             ? "카드를 뒤집는 중입니다."
             : savedResult
-            ? `${deckSize}장 중 ${savedResult.rankValue}번째 서열 카드입니다.`
+            ? `${deckSize}장 중 ${deckSize - savedResult.rankValue + 1}번째로 높은 카드입니다.`
             : isShuffling
               ? "손을 떼는 순간의 카드가 내 카드!"
               : "버튼을 누르고 있는 동안 카드를 섞습니다."}
