@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { getGameDefinition } from "@/components/games/registry";
 import { todayGame as mockTodayGame } from "@/lib/mock-data";
 import {
   changePassword,
@@ -13,28 +14,10 @@ import {
   signOut,
   submitGameResult,
 } from "@/lib/game-service";
-import {
-  drawYutResult,
-  probabilityTable,
-  type YutLabel,
-  type YutGaugeResult,
-} from "@/lib/games/yut-gauge";
-import type { DailyGame, LeaderboardRow } from "@/lib/types";
+import type { DailyGame, GameResult, LeaderboardRow } from "@/lib/types";
 import styles from "./lunch-game-app.module.css";
 
-type PlayState = "aiming" | "throwing" | "submitted";
 type ScreenState = "login" | "intro" | "game";
-type StickFace = "front" | "back";
-
-const idleSticks: StickFace[] = ["back", "front", "back", "front"];
-
-const sticksByLabel: Record<YutLabel, StickFace[]> = {
-  "도": ["front", "back", "back", "back"],
-  "개": ["front", "front", "back", "back"],
-  "걸": ["front", "front", "front", "back"],
-  "윷": ["front", "front", "front", "front"],
-  "모": ["back", "back", "back", "back"],
-};
 
 function getLosers(rows: LeaderboardRow[]) {
   const submitted = rows.filter((row) => row.rankValue > 0);
@@ -69,14 +52,12 @@ export function LunchGameApp() {
   const [userName, setUserName] = useState("나");
   const [todayGame, setTodayGame] = useState<DailyGame>(mockTodayGame);
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
-  const [gaugePosition, setGaugePosition] = useState(0.5);
-  const [isRunning, setIsRunning] = useState(true);
-  const [result, setResult] = useState<YutGaugeResult | null>(null);
-  const [pendingResult, setPendingResult] = useState<YutGaugeResult | null>(null);
-  const [playState, setPlayState] = useState<PlayState>("aiming");
+  const [result, setResult] = useState<GameResult | null>(null);
   const [isBusy, setIsBusy] = useState(false);
   const [isBooting, setIsBooting] = useState(true);
   const [notice, setNotice] = useState("");
+
+  const game = getGameDefinition(todayGame.gameType);
 
   const displayLeaderboard = useMemo(() => {
     if (!result) return leaderboard;
@@ -122,9 +103,7 @@ export function LunchGameApp() {
         setLeaderboard(rows);
 
         if (savedResult) {
-          setResult(savedResult as YutGaugeResult);
-          setPlayState("submitted");
-          setIsRunning(false);
+          setResult(savedResult as GameResult);
           setScreenState("game");
         } else {
           setScreenState("intro");
@@ -160,9 +139,7 @@ export function LunchGameApp() {
       setLeaderboard(rows);
 
       if (savedResult) {
-        setResult(savedResult as YutGaugeResult);
-        setPlayState("submitted");
-        setIsRunning(false);
+        setResult(savedResult as GameResult);
         setScreenState("game");
       } else {
         setScreenState("intro");
@@ -194,47 +171,19 @@ export function LunchGameApp() {
     await signOut();
     setScreenState("login");
     setResult(null);
-    setPendingResult(null);
-    setPlayState("aiming");
-    setIsRunning(true);
   }
 
-  useEffect(() => {
-    if (!isRunning || playState !== "aiming") return;
-
-    let frame = 0;
-    const startedAt = performance.now();
-    const tick = (now: number) => {
-      const elapsed = now - startedAt;
-      const cycle = 1250;
-      const progress = (elapsed % cycle) / cycle;
-      const position =
-        progress < 0.5 ? progress * 2 : 1 - (progress - 0.5) * 2;
-
-      setGaugePosition(position);
-      frame = requestAnimationFrame(tick);
-    };
-
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [isRunning, playState]);
-
-  useEffect(() => {
-    if (playState !== "throwing" || !pendingResult) return;
-
-    const revealTimer = window.setTimeout(async () => {
-      const finalResult = pendingResult;
-      setResult(finalResult);
-      setPlayState("submitted");
-      setPendingResult(null);
+  const handleGameFinish = useCallback(
+    async (gameResult: GameResult) => {
+      setResult(gameResult);
 
       try {
         await submitGameResult({
           gameId: todayGame.id,
-          score: finalResult.score,
-          rankValue: finalResult.rankValue,
-          resultLabel: finalResult.resultLabel,
-          metadata: finalResult.metadata,
+          score: gameResult.score,
+          rankValue: gameResult.rankValue,
+          resultLabel: gameResult.resultLabel,
+          metadata: gameResult.metadata,
         });
       } catch (error) {
         setNotice(`결과 저장 실패: ${(error as Error).message}`);
@@ -247,26 +196,10 @@ export function LunchGameApp() {
       } catch (error) {
         setNotice(`랭킹 조회 실패: ${(error as Error).message}`);
       }
-    }, 1350);
+    },
+    [todayGame.id],
+  );
 
-    return () => window.clearTimeout(revealTimer);
-  }, [pendingResult, playState, todayGame.id]);
-
-  function throwYut() {
-    if (playState !== "aiming" || hasPastCutoff) return;
-
-    const nextResult = drawYutResult(gaugePosition);
-    setIsRunning(false);
-    setPendingResult(nextResult);
-    setPlayState("throwing");
-  }
-
-  const visibleSticks =
-    playState === "submitted" && result
-      ? sticksByLabel[result.resultLabel]
-      : idleSticks;
-
-  const isLocked = playState !== "aiming";
   const participationStatus = result
     ? "참여 완료"
     : screenState === "game"
@@ -350,12 +283,8 @@ export function LunchGameApp() {
               <span className={styles.cutoff}>{todayGame.cutoffLabel} 종료</span>
             </div>
             <div className={styles.descriptionPanel}>
-              <strong>게이지를 보고 윷을 던지세요</strong>
-              <p>
-                버튼을 누르면 게이지가 멈추고 윷가락을 던집니다. 가운데에
-                가까울수록 좋은 결과 확률이 올라가지만, 모가 보장되지는
-                않습니다.
-              </p>
+              <strong>{game.introHeadline}</strong>
+              <p>{game.introDescription}</p>
               <div className={styles.statusGrid}>
                 <span>상태</span>
                 <strong>{participationStatus}</strong>
@@ -407,72 +336,13 @@ export function LunchGameApp() {
               <span className={styles.cutoff}>{participationStatus}</span>
           </div>
 
-          <div className={styles.yutStage} aria-label="윷 결과 화면">
-            <div
-              className={[
-                styles.yutSticks,
-                playState === "throwing" ? styles.throwing : "",
-              ].join(" ")}
-            >
-              {visibleSticks.map((face, index) => (
-                <div
-                  className={[
-                    styles.stick,
-                    styles[face],
-                    playState === "throwing" ? styles[`spin${index + 1}`] : "",
-                  ].join(" ")}
-                  key={index}
-                >
-                  <span />
-                </div>
-              ))}
-            </div>
-            <p>
-              {playState === "throwing"
-                ? "윷가락이 떨어지는 중입니다."
-                : result
-                ? `${result.metadata.accuracyBand.toUpperCase()} · rank ${result.rankValue}`
-                : "가운데에 가까울수록 좋은 결과 확률이 올라갑니다."}
-            </p>
-            <div className={styles.yutMark}>{result ? result.resultLabel : "대기"}</div>
-          </div>
+          <game.Play
+            cutoffPassed={hasPastCutoff}
+            onFinish={handleGameFinish}
+            savedResult={result}
+          />
 
-          <div className={styles.gaugeWrap}>
-            <div className={styles.gaugeMeta}>
-              <span>Bad</span>
-              <span>Perfect</span>
-              <span>Bad</span>
-            </div>
-            <div
-              aria-label="윷 게이지"
-              aria-valuemax={1}
-              aria-valuemin={0}
-              aria-valuenow={Number(gaugePosition.toFixed(3))}
-              className={styles.gauge}
-              role="meter"
-            >
-              <div
-                className={styles.marker}
-                style={{ left: `${gaugePosition * 100}%` }}
-              />
-            </div>
-          </div>
-
-          <button
-            className={styles.throwButton}
-            disabled={isLocked || hasPastCutoff}
-            onClick={throwYut}
-            type="button"
-          >
-            {playState === "throwing"
-              ? "윷 던지는 중"
-              : playState === "submitted"
-                ? "오늘은 이미 참여했습니다"
-                : hasPastCutoff
-                  ? "오늘 게임이 끝났습니다"
-                : "게이지 멈추고 윷 던지기"}
-          </button>
-          <p className={styles.finalNotice}>한 번 던지면 다시 참여할 수 없습니다.</p>
+          <p className={styles.finalNotice}>한 번 참여하면 다시 할 수 없습니다.</p>
         </section>
         ) : null}
 
@@ -482,7 +352,7 @@ export function LunchGameApp() {
             <p className={styles.sectionLabel}>내 결과</p>
             <div className={styles.myResult}>
               <span>{result.resultLabel}</span>
-              <strong>{result.metadata.accuracyBand.toUpperCase()}</strong>
+              <strong>{game.resultCaption(result)}</strong>
             </div>
           </div>
         </section>
@@ -521,20 +391,6 @@ export function LunchGameApp() {
               <p>KST 12:30 전에는 미참여자에게 결과를 보여주지 않습니다.</p>
             </div>
           )}
-        </section>
-        ) : null}
-
-        {screenState === "game" ? (
-        <section className={styles.table}>
-          <p className={styles.sectionLabel}>확률 테이블</p>
-          {probabilityTable.map((row) => (
-            <div className={styles.probRow} key={row.band}>
-              <strong>{row.band}</strong>
-              <span>모 {row.weights["모"]}%</span>
-              <span>윷 {row.weights["윷"]}%</span>
-              <span>걸 {row.weights["걸"]}%</span>
-            </div>
-          ))}
         </section>
         ) : null}
       </section>

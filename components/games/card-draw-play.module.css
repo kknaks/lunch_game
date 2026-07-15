@@ -1,0 +1,460 @@
+.cardStage {
+  display: grid;
+  place-items: center;
+  min-height: 244px;
+  margin-bottom: 18px;
+  padding: 18px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(214, 233, 220, 0.9), rgba(240, 249, 243, 0.92)),
+    radial-gradient(circle at 50% 30%, #2f7d4f, #1d5636);
+  text-align: center;
+  overflow: hidden;
+}
+
+.cardStage p {
+  max-width: 280px;
+  margin: 0 0 12px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* ---- 실제 트럼프 카드 뒷면: 흰 테두리 + 파란 격자 패턴 ---- */
+
+.cardBackSkin {
+  border: 1px solid #d4d4d8;
+  border-radius: 9px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 6px 14px rgba(15, 23, 42, 0.22);
+}
+
+.cardBackSkin::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 5px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.28) 0 1.5px,
+      transparent 1.5px 7px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.28) 0 1.5px,
+      transparent 1.5px 7px
+    ),
+    radial-gradient(circle at 50% 42%, #2e4f9e 0%, #1e3a8a 55%, #172554 100%);
+}
+
+/* ---- 덱 + 리플 셔플 ---- */
+
+.deck {
+  position: relative;
+  width: 230px;
+  height: 158px;
+  margin-bottom: 6px;
+}
+
+.half {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  width: 84px;
+  height: 118px;
+  transform: translateX(-50%);
+}
+
+.halfRight {
+  transform: translateX(-50%) translateY(-3px);
+}
+
+.stackCard {
+  composes: cardBackSkin;
+  position: absolute;
+  inset: 0;
+}
+
+.stackCard:nth-child(2) {
+  transform: translateY(-2px);
+}
+
+.stackCard:nth-child(3) {
+  transform: translateY(-4px);
+}
+
+.flyer {
+  composes: cardBackSkin;
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  width: 84px;
+  height: 118px;
+  opacity: 0;
+  transform: translateX(-50%);
+}
+
+.shuffling .halfLeft {
+  animation: splitLeft 1.5s ease-in-out infinite;
+}
+
+.shuffling .halfRight {
+  animation: splitRight 1.5s ease-in-out infinite;
+}
+
+.shuffling .flyer1 {
+  animation: riffleFromLeft1 1.5s ease-in-out infinite;
+}
+
+.shuffling .flyer2 {
+  animation: riffleFromRight1 1.5s ease-in-out infinite;
+}
+
+.shuffling .flyer3 {
+  animation: riffleFromLeft2 1.5s ease-in-out infinite;
+}
+
+.shuffling .flyer4 {
+  animation: riffleFromRight2 1.5s ease-in-out infinite;
+}
+
+.shuffling .flyer5 {
+  animation: riffleFromLeft3 1.5s ease-in-out infinite;
+}
+
+.shuffling .flyer6 {
+  animation: riffleFromRight3 1.5s ease-in-out infinite;
+}
+
+/* ---- 카드 공개(플립) ---- */
+
+.flipCard {
+  position: relative;
+  width: 108px;
+  height: 152px;
+  margin-bottom: 12px;
+  transform-style: preserve-3d;
+}
+
+.flipping {
+  animation: flipIn 0.9s cubic-bezier(0.2, 0.7, 0.25, 1) both;
+}
+
+.flipped {
+  transform: rotateY(0deg);
+}
+
+.cardFace {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  backface-visibility: hidden;
+}
+
+.cardBackFace {
+  composes: cardBackSkin;
+  transform: rotateY(180deg);
+}
+
+.cardFrontFace {
+  border: 1px solid #d4d4d8;
+  background: linear-gradient(160deg, #ffffff 0%, #fafafa 65%, #f1f1f2 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 10px 22px rgba(15, 23, 42, 0.2);
+  color: #1f2937;
+}
+
+.cardFrontFace::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(31, 41, 55, 0.1);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.redSuit {
+  color: #dc2626;
+}
+
+.cornerTop,
+.cornerBottom {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  line-height: 1;
+  font-size: 18px;
+  font-weight: 800;
+  font-family: "Times New Roman", Georgia, serif;
+}
+
+.cornerTop {
+  top: 9px;
+  left: 10px;
+}
+
+.cornerBottom {
+  right: 10px;
+  bottom: 9px;
+  transform: rotate(180deg);
+}
+
+.cornerTop em,
+.cornerBottom em {
+  margin-top: 1px;
+  font-style: normal;
+  font-size: 15px;
+}
+
+.suitBig {
+  font-size: 56px;
+  line-height: 1;
+  text-shadow: 0 2px 3px rgba(15, 23, 42, 0.14);
+}
+
+.cardMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--coffee);
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.actionButton {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 750;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.actionButton:disabled {
+  cursor: default;
+  opacity: 0.62;
+}
+
+.holding {
+  background: var(--coffee, #7c4a21);
+  border-color: var(--coffee, #7c4a21);
+}
+
+/* ---- keyframes ---- */
+
+/* 덱이 두 뭉치로 갈라졌다가(0~18%) 리플로 끼워지고(20~62%) 다시 합쳐짐(78~100%) */
+@keyframes splitLeft {
+  0%,
+  100% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  16%,
+  62% {
+    transform: translateX(calc(-50% - 46px)) translateY(3px) rotate(-13deg);
+  }
+  82% {
+    transform: translateX(calc(-50% - 2px)) rotate(-1deg);
+  }
+}
+
+@keyframes splitRight {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(-3px) rotate(0deg);
+  }
+  16%,
+  62% {
+    transform: translateX(calc(-50% + 46px)) translateY(0px) rotate(13deg);
+  }
+  82% {
+    transform: translateX(calc(-50% + 2px)) translateY(-3px) rotate(1deg);
+  }
+}
+
+@keyframes riffleFromLeft1 {
+  0%,
+  17% {
+    opacity: 0;
+    transform: translateX(calc(-50% - 46px)) translateY(3px) rotate(-13deg);
+  }
+  18% {
+    opacity: 1;
+    transform: translateX(calc(-50% - 46px)) translateY(3px) rotate(-13deg);
+  }
+  22% {
+    opacity: 1;
+    transform: translateX(calc(-50% - 22px)) translateY(-14px) rotate(-6deg);
+  }
+  26%,
+  76% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-1px) rotate(0.6deg);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-1px) rotate(0deg);
+  }
+}
+
+@keyframes riffleFromRight1 {
+  0%,
+  24% {
+    opacity: 0;
+    transform: translateX(calc(-50% + 46px)) rotate(13deg);
+  }
+  25% {
+    opacity: 1;
+    transform: translateX(calc(-50% + 46px)) rotate(13deg);
+  }
+  29% {
+    opacity: 1;
+    transform: translateX(calc(-50% + 22px)) translateY(-16px) rotate(6deg);
+  }
+  33%,
+  76% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-2px) rotate(-0.8deg);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-2px) rotate(0deg);
+  }
+}
+
+@keyframes riffleFromLeft2 {
+  0%,
+  31% {
+    opacity: 0;
+    transform: translateX(calc(-50% - 46px)) translateY(3px) rotate(-13deg);
+  }
+  32% {
+    opacity: 1;
+    transform: translateX(calc(-50% - 46px)) translateY(3px) rotate(-13deg);
+  }
+  36% {
+    opacity: 1;
+    transform: translateX(calc(-50% - 22px)) translateY(-15px) rotate(-7deg);
+  }
+  40%,
+  76% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-3px) rotate(0.9deg);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-3px) rotate(0deg);
+  }
+}
+
+@keyframes riffleFromRight2 {
+  0%,
+  38% {
+    opacity: 0;
+    transform: translateX(calc(-50% + 46px)) rotate(13deg);
+  }
+  39% {
+    opacity: 1;
+    transform: translateX(calc(-50% + 46px)) rotate(13deg);
+  }
+  43% {
+    opacity: 1;
+    transform: translateX(calc(-50% + 21px)) translateY(-17px) rotate(7deg);
+  }
+  47%,
+  76% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px) rotate(-0.7deg);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px) rotate(0deg);
+  }
+}
+
+@keyframes riffleFromLeft3 {
+  0%,
+  45% {
+    opacity: 0;
+    transform: translateX(calc(-50% - 46px)) translateY(3px) rotate(-13deg);
+  }
+  46% {
+    opacity: 1;
+    transform: translateX(calc(-50% - 46px)) translateY(3px) rotate(-13deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(calc(-50% - 23px)) translateY(-14px) rotate(-6deg);
+  }
+  54%,
+  76% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-5px) rotate(0.7deg);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-5px) rotate(0deg);
+  }
+}
+
+@keyframes riffleFromRight3 {
+  0%,
+  52% {
+    opacity: 0;
+    transform: translateX(calc(-50% + 46px)) rotate(13deg);
+  }
+  53% {
+    opacity: 1;
+    transform: translateX(calc(-50% + 46px)) rotate(13deg);
+  }
+  57% {
+    opacity: 1;
+    transform: translateX(calc(-50% + 22px)) translateY(-16px) rotate(6deg);
+  }
+  61%,
+  76% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-6px) rotate(-0.6deg);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px) rotate(0deg);
+  }
+}
+
+@keyframes flipIn {
+  0% {
+    transform: rotateY(180deg) scale(0.9);
+  }
+  55% {
+    transform: rotateY(180deg) scale(1.04);
+  }
+  100% {
+    transform: rotateY(0deg) scale(1);
+  }
+}

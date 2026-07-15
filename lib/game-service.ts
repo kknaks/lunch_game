@@ -1,6 +1,6 @@
 import { todayGame } from "@/lib/mock-data";
 import { supabase } from "@/lib/supabase/client";
-import type { DailyGame, GameResultPayload, LeaderboardRow } from "@/lib/types";
+import type { DailyGame, GameResultPayload, GameType, LeaderboardRow } from "@/lib/types";
 
 type AuthUser = {
   id: string;
@@ -11,7 +11,7 @@ type AuthUser = {
 type DbDailyGame = {
   id: string;
   play_date: string;
-  game_type: "yut_gauge";
+  game_type: GameType;
   title: string;
   cutoff_at: string;
   status: "open" | "closed";

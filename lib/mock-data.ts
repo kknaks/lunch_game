@@ -1,12 +1,12 @@
 import type { DailyGame } from "@/lib/types";
 
 export const todayGame: DailyGame = {
-  id: "mock-daily-yut-001",
-  playDate: "2026-07-14",
-  gameType: "yut_gauge",
-  title: "오늘의 윷놀이",
-  cutoffAt: "2026-07-14T03:30:00.000Z",
-  cutoffLabel: "12:30",
+  id: "mock-daily-card-001",
+  playDate: "2026-07-15",
+  gameType: "card_draw",
+  title: "오늘의 카드뽑기",
+  cutoffAt: "2026-07-15T14:59:00.000Z",
+  cutoffLabel: "23:59",
   status: "open",
 };
 

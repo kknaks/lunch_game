@@ -1,9 +1,16 @@
-import type { YutGaugeResult } from "@/lib/games/yut-gauge";
+export type GameType = "yut_gauge" | "card_draw";
+
+export type GameResult = {
+  resultLabel: string;
+  rankValue: number;
+  score: number;
+  metadata: { gameType: GameType } & Record<string, unknown>;
+};
 
 export type DailyGame = {
   id: string;
   playDate: string;
-  gameType: "yut_gauge";
+  gameType: GameType;
   title: string;
   cutoffAt: string;
   cutoffLabel: string;
@@ -16,10 +23,4 @@ export type LeaderboardRow = {
   rankValue: number;
 };
 
-export type GameResultPayload = {
-  gameId: string;
-  score: number;
-  rankValue: number;
-  resultLabel: YutGaugeResult["resultLabel"];
-  metadata: YutGaugeResult["metadata"];
-};
+export type GameResultPayload = GameResult & { gameId: string };

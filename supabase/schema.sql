@@ -13,7 +13,7 @@ create table if not exists public.profiles (
 create table if not exists public.daily_games (
   id uuid primary key default gen_random_uuid(),
   play_date date not null unique,
-  game_type text not null check (game_type in ('yut_gauge')),
+  game_type text not null check (game_type in ('yut_gauge', 'card_draw')),
   title text not null,
   cutoff_at timestamptz not null,
   status text not null default 'open' check (status in ('open', 'closed')),
