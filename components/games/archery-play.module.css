@@ -1,0 +1,321 @@
+.archeryStage {
+  display: grid;
+  place-items: center;
+  min-height: 244px;
+  margin-bottom: 18px;
+  padding: 18px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(219, 234, 254, 0.75), rgba(255, 255, 255, 0.92)),
+    linear-gradient(180deg, #93c5fd 0%, #dbeafe 55%, #d1fae5 100%);
+  text-align: center;
+  overflow: hidden;
+}
+
+.archeryStage p {
+  max-width: 280px;
+  margin: 0 0 12px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* 풀밭 사대: 위쪽 하늘, 아래쪽 잔디(깎은 줄무늬) */
+.scene {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(21, 128, 61, 0.25);
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, #b5dcf8 0%, #dff0fc 34%, rgba(223, 240, 252, 0) 37%),
+    repeating-linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0.09) 0 26px,
+      rgba(255, 255, 255, 0) 26px 52px
+    ),
+    linear-gradient(180deg, #9ed8a0 36%, #58b368 68%, #3d9550 100%);
+  overflow: hidden;
+}
+
+.targetWrap {
+  position: absolute;
+  top: 54%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  transform: translate(-50%, -56%) scale(0.5);
+}
+
+/* 화살이 날아가는 3초 동안 과녁이 점점 가까워진다 */
+.approaching {
+  transform: translate(-50%, -50%) scale(1.5);
+  transition: transform 3s cubic-bezier(0.42, 0.05, 0.58, 1);
+}
+
+.zoomed {
+  transform: translate(-50%, -50%) scale(1.5);
+}
+
+.targetStand {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  width: 118px;
+  height: 64px;
+  border-left: 7px solid #8b5e34;
+  border-right: 7px solid #8b5e34;
+  border-radius: 4px;
+  transform: translateX(-50%) perspective(120px) rotateX(18deg);
+}
+
+.targetShadow {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  width: 130px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(21, 61, 31, 0.28);
+  filter: blur(4px);
+  transform: translateX(-50%);
+}
+
+/* 실제 양궁 과녁: 노랑(10·9) → 빨강(8·7) → 파랑(6·5) → 검정(4·3) → 흰색(2·1) */
+.target {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fde047 0% 9.5%,
+    #facc15 9.5% 19%,
+    rgba(120, 53, 15, 0.55) 19% 20%,
+    #f87171 20% 29.5%,
+    #ef4444 29.5% 39%,
+    rgba(69, 10, 10, 0.5) 39% 40%,
+    #93c5fd 40% 49.5%,
+    #3b82f6 49.5% 59%,
+    rgba(30, 58, 138, 0.55) 59% 60%,
+    #4b5563 60% 69.5%,
+    #1f2937 69.5% 79%,
+    rgba(255, 255, 255, 0.6) 79% 80%,
+    #f8fafc 80% 89.5%,
+    #e2e8f0 89.5% 99%,
+    #94a3b8 99% 100%
+  );
+  box-shadow:
+    0 10px 24px rgba(15, 23, 42, 0.28),
+    0 0 0 4px #d6c8b2,
+    0 0 0 6px #b9a583;
+}
+
+.target::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(120, 53, 15, 0.75);
+  transform: translate(-50%, -50%);
+}
+
+/* 꽂힌 화살 (정면 뷰: 45도로 꽂힌 샤프트 + 노크) */
+.arrowHit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 4px;
+  transform-origin: 0 50%;
+  animation: stick 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+
+.arrowShaft {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #713f12, #ca8a04 55%, #fef08a);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.4);
+}
+
+.arrowNock {
+  position: absolute;
+  top: 50%;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fca5a5, #dc2626 70%);
+  transform: translateY(-50%);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.45);
+}
+
+.arrowMiss {
+  opacity: 0.85;
+}
+
+/* 발사된 화살: 3초 동안 포물선을 그리며 과녁 쪽으로 작아지며 날아감 */
+.arrowFly {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  width: 74px;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fef08a, #ca8a04 45%, #713f12);
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.35);
+  animation: fly 3s cubic-bezier(0.42, 0.05, 0.58, 1) both;
+}
+
+.arrowFly::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -7px;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 10px solid #4a2c11;
+  transform: translateY(-50%);
+}
+
+.arrowFly::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -2px;
+  width: 16px;
+  height: 12px;
+  background:
+    repeating-linear-gradient(75deg, #dc2626 0 3px, #fca5a5 3px 6px);
+  border-radius: 2px 6px 6px 2px;
+}
+
+.scoreMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--coffee);
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.gaugeWrap {
+  position: relative;
+  margin: 12px 0 18px;
+  padding: 10px 0 0;
+}
+
+.gaugeMeta {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.perfectLabel {
+  position: absolute;
+  left: 80%;
+  transform: translateX(-50%);
+  color: #15803d;
+}
+
+/* 80%가 만점, 지나칠수록 급격히 나빠지고 끝(~95.5%)부터 낙 구간 */
+.gauge {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  border: 1px solid var(--input);
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(239, 68, 68, 0.3) 0%,
+    rgba(245, 158, 11, 0.36) 40%,
+    rgba(132, 204, 22, 0.5) 65%,
+    rgba(22, 163, 74, 0.85) 80%,
+    rgba(132, 204, 22, 0.5) 86%,
+    rgba(245, 158, 11, 0.4) 91%,
+    rgba(127, 29, 29, 0.68) 95.5%,
+    rgba(127, 29, 29, 0.55) 100%
+  );
+  overflow: visible;
+}
+
+.perfectTick {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  border-radius: 2px;
+  background: #14532d;
+  transform: translateX(-50%);
+}
+
+.marker {
+  position: absolute;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 7px 16px rgba(24, 24, 27, 0.22);
+  transform: translate(-50%, -50%);
+}
+
+.actionButton {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.actionButton:disabled {
+  cursor: default;
+  opacity: 0.62;
+}
+
+@keyframes fly {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) rotate(-42deg) scale(1.5);
+  }
+  45% {
+    transform: translateX(-54%) translateY(-58px) rotate(-22deg) scale(0.7);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-86px) rotate(-4deg) scale(0.12);
+  }
+}
+
+@keyframes stick {
+  0% {
+    opacity: 0;
+    scale: 1.9;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}

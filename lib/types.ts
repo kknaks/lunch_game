@@ -1,4 +1,4 @@
-export type GameType = "yut_gauge" | "card_draw";
+export type GameType = "yut_gauge" | "card_draw" | "archery";
 
 export type GameResult = {
   resultLabel: string;

@@ -1,5 +1,6 @@
 import { deckSize } from "@/lib/games/card-draw";
 import type { GameType } from "@/lib/types";
+import { ArcheryPlay } from "./archery-play";
 import { CardDrawPlay } from "./card-draw-play";
 import type { GameDefinition } from "./types";
 import { YutGaugePlay } from "./yut-gauge-play";
@@ -24,6 +25,18 @@ export const gameDefinitions: Record<GameType, GameDefinition> = {
     resultCaption: (result) =>
       `${deckSize}장 중 ${deckSize - result.rankValue + 1}번째로 높은 카드`,
     Play: CardDrawPlay,
+  },
+  archery: {
+    type: "archery",
+    defaultTitle: "오늘의 양궁",
+    introHeadline: "만점 지점을 노려 발사하세요",
+    introDescription:
+      "게이지가 만점(80%) 지점에 가까워질수록 급격히 빨라집니다. 버튼을 눌러 멈춘 지점이 조준점 — 만점에서 멀어질수록 점수가 낮아지고, 지나친 쪽은 훨씬 가파르게 떨어지며 끝까지 가면 낙(0점)입니다.",
+    resultCaption: (result) => {
+      const score = Number(result.metadata.score ?? result.rankValue - 1);
+      return score === 0 ? "과녁을 빗나갔습니다" : `10점 만점에 ${score}점`;
+    },
+    Play: ArcheryPlay,
   },
 };
 

@@ -6,7 +6,8 @@ with game_pool as (
   select *
   from (values
     (0, 'yut_gauge', '오늘의 윷놀이'),
-    (1, 'card_draw', '오늘의 카드뽑기')
+    (1, 'card_draw', '오늘의 카드뽑기'),
+    (2, 'archery', '오늘의 양궁')
   ) as t(idx, game_type, title)
 ),
 picked as (

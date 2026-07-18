@@ -19,11 +19,19 @@ import styles from "./lunch-game-app.module.css";
 
 type ScreenState = "login" | "intro" | "game";
 
-function getLosers(rows: LeaderboardRow[]) {
+// 참여자 중 하위 25%(반올림)가 커피를 산다. 경계 동점자는 함께 포함.
+function getCoffeeBuyers(rows: LeaderboardRow[]) {
   const submitted = rows.filter((row) => row.rankValue > 0);
   if (submitted.length === 0) return [];
-  const min = Math.min(...submitted.map((row) => row.rankValue));
-  return submitted.filter((row) => row.rankValue === min);
+
+  const buyerCount = Math.round(submitted.length * 0.25);
+  if (buyerCount === 0) return [];
+  const sorted = submitted
+    .slice()
+    .sort((a, b) => a.rankValue - b.rankValue);
+  const threshold = sorted[buyerCount - 1].rankValue;
+
+  return sorted.filter((row) => row.rankValue <= threshold);
 }
 
 function getRankedRows(rows: LeaderboardRow[]) {
@@ -76,7 +84,14 @@ export function LunchGameApp() {
     );
   }, [leaderboard, result, userName]);
 
-  const losers = useMemo(() => getLosers(displayLeaderboard), [displayLeaderboard]);
+  const coffeeBuyers = useMemo(
+    () => getCoffeeBuyers(displayLeaderboard),
+    [displayLeaderboard],
+  );
+  const buyerNames = useMemo(
+    () => new Set(coffeeBuyers.map((row) => row.name)),
+    [coffeeBuyers],
+  );
   const rankedRows = useMemo(() => getRankedRows(displayLeaderboard), [displayLeaderboard]);
   const hasPastCutoff = isPastCutoff(todayGame.cutoffAt);
   const canSeeResults = Boolean(result) || hasPastCutoff;
@@ -366,24 +381,33 @@ export function LunchGameApp() {
               <h2>오늘의 랭킹</h2>
             </div>
             <span className={styles.loserBadge}>
-              {canSeeResults
-                ? `꼴찌 ${losers.map((row) => row.name).join(", ")}`
-                : "결과 비공개"}
+              {!canSeeResults
+                ? "결과 비공개"
+                : coffeeBuyers.length === 0
+                  ? "커피 담당 없음"
+                  : `☕ 커피: ${coffeeBuyers.map((row) => row.name).join(", ")}`}
             </span>
           </div>
           {canSeeResults ? (
             <div className={styles.rows}>
-              {rankedRows.map((row) => (
-                <div className={styles.row} key={row.name}>
-                  <div className={styles.rankName}>
-                    <span className={styles.rank}>
-                      {row.rank ? `${row.rank}등` : "-"}
-                    </span>
-                    <span>{row.name}</span>
+              {rankedRows.map((row) => {
+                const isBuyer = row.rankValue > 0 && buyerNames.has(row.name);
+                return (
+                  <div
+                    className={[styles.row, isBuyer ? styles.buyerRow : ""].join(" ")}
+                    key={row.name}
+                  >
+                    <div className={styles.rankName}>
+                      <span className={styles.rank}>
+                        {row.rank ? `${row.rank}등` : "-"}
+                      </span>
+                      <span>{row.name}</span>
+                      {isBuyer ? <span className={styles.buyerTag}>☕ 커피</span> : null}
+                    </div>
+                    <strong>{row.rankValue > 0 ? row.resultLabel : "대기"}</strong>
                   </div>
-                  <strong>{row.rankValue > 0 ? row.resultLabel : "대기"}</strong>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className={styles.lockedBoard}>
